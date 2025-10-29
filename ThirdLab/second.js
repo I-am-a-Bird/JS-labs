@@ -1,317 +1,312 @@
-
+// Класс Двигатель - базовый компонент транспортного средства
 class Engine {
-  constructor(type, power, volume) {
-    this.type = type;
-    this.power = power;
-    this.volume = volume;
-  }
-
-  static createDiesel(power, volume) {
-    return new Engine('diesel', power, volume);
-  }
-
-  static createElectric(power) {
-    return new Engine('electric', power, null);
-  }
-
-  static createGasoline(power, volume) {
-    return new Engine('gasoline', power, volume);
-  }
-
-  getInfo() {
-    if (this.type === 'electric') {
-      return `${this.type} engine, power: ${this.power}kW`;
+    #type;  // Приватное поле: тип двигателя (дизельный, бензиновый, электрический)
+    #power; // Приватное поле: мощность двигателя в лошадиных силах
+    
+    // Конструктор класса Engine - создает новый объект двигателя
+    constructor(type = "Бензиновый", power = 100) {
+        this.#type = type;   // Устанавливаем тип двигателя
+        this.#power = power; // Устанавливаем мощность двигателя
     }
-    return `${this.type} engine, power: ${this.power}HP, volume: ${this.volume}L`;
-  }
-
-  start() {
-    return `${this.type} engine started`;
-  }
-
-  stop() {
-    return `${this.type} engine stopped`;
-  }
+    
+    // Геттер для получения типа двигателя
+    get type() { return this.#type; }
+    
+    // Геттер для получения мощности двигателя  
+    get power() { return this.#power; }
+    
+    // Метод для строкового представления двигателя
+    toString() { return `${this.#type} (${this.#power} л.с.)`; }
 }
 
-class Carriage {
-  constructor(type, capacity, comfortLevel) {
-    this.type = type;
-    this.capacity = capacity;
-    this.comfortLevel = comfortLevel;
-  }
-
-  static createPassenger(capacity, comfortLevel = 'standard') {
-    return new Carriage('passenger', capacity, comfortLevel);
-  }
-
-  static createCargo(capacity) {
-    return new Carriage('cargo', capacity, 'none');
-  }
-
-  static createRestaurant() {
-    return new Carriage('restaurant', 40, 'high');
-  }
-
-  getInfo() {
-    return `${this.type} carriage, capacity: ${this.capacity}, comfort: ${this.comfortLevel}`;
-  }
-
-  load(passengers) {
-    return `Loading ${passengers} into ${this.type} carriage`;
-  }
-
-  unload() {
-    return `Unloading ${this.type} carriage`;
-  }
+// Класс Вагон - компонент поезда
+class Wagon {
+    #type;      // Приватное поле: тип вагона (пассажирский, грузовой, ресторан)
+    #capacity;  // Приватное поле: вместимость вагона (количество мест или груза)
+    
+    // Конструктор класса Wagon - создает новый объект вагона
+    constructor(type = "Пассажирский", capacity = 50) {
+        this.#type = type;         // Устанавливаем тип вагона
+        this.#capacity = capacity; // Устанавливаем вместимость вагона
+    }
+    
+    // Геттер для получения типа вагона
+    get type() { return this.#type; }
+    
+    // Геттер для получения вместимости вагона
+    get capacity() { return this.#capacity; }
+    
+    // Метод для строкового представления вагона
+    toString() { return `${this.#type} (${this.#capacity} мест)`; }
 }
 
-class TransportVehicle {
-  constructor(name, engine, maxSpeed, capacity) {
-    this.name = name;
-    this.engine = engine;
-    this.maxSpeed = maxSpeed;
-    this.capacity = capacity;
-    this.isMoving = false;
-  }
-
-  static createAutomobile(name, engine, maxSpeed, capacity) {
-    return new TransportVehicle(name, engine, maxSpeed, capacity);
-  }
-
-  static createLocomotive(name, engine, maxSpeed) {
-    return new TransportVehicle(name, engine, maxSpeed, 0);
-  }
-
-  static createExpress(name, engine, maxSpeed, capacity) {
-    return new TransportVehicle(name, engine, maxSpeed, capacity);
-  }
-
-  getInfo() {
-    return `${this.name}, max speed: ${this.maxSpeed}km/h, capacity: ${this.capacity}, engine: ${this.engine.getInfo()}`;
-  }
-
-  start() {
-    this.isMoving = true;
-    return `${this.name} started moving. ${this.engine.start()}`;
-  }
-
-  stop() {
-    this.isMoving = false;
-    return `${this.name} stopped. ${this.engine.stop()}`;
-  }
-
-  getStatus() {
-    return `${this.name} is ${this.isMoving ? 'moving' : 'stopped'}`;
-  }
+// Класс Транспортное средство - базовый класс для всех видов транспорта
+// КОМПОЗИЦИЯ: Vehicle содержит (состоит из) Engine
+class Vehicle {
+    #name;      // Приватное поле: название транспортного средства
+    #maxSpeed;  // Приватное поле: максимальная скорость
+    #engine;    // Приватное поле: объект двигателя (КОМПОЗИЦИЯ)
+    
+    // Конструктор класса Vehicle - создает новое транспортное средство
+    constructor(name, maxSpeed, engine) {
+        this.#name = name;           // Устанавливаем название
+        this.#maxSpeed = maxSpeed;   // Устанавливаем максимальную скорость
+        this.#engine = engine;       // Устанавливаем двигатель (композиция)
+    }
+    
+    // Геттер для получения названия
+    get name() { return this.#name; }
+    
+    // Геттер для получения максимальной скорости
+    get maxSpeed() { return this.#maxSpeed; }
+    
+    // Геттер для получения двигателя
+    get engine() { return this.#engine; }
+    
+    // Метод для строкового представления транспортного средства
+    toString() { return `${this.#name} (${this.#maxSpeed} км/ч) с ${this.#engine}`; }
 }
 
+// Класс Автомобиль - представляет автомобильный транспорт
+// КОМПОЗИЦИЯ: Car содержит (состоит из) Vehicle
+class Car {
+    #vehicle;       // Приватное поле: объект транспортного средства (КОМПОЗИЦИЯ)
+    #bodyType;      // Приватное поле: тип кузова автомобиля
+    #doorsCount;    // Приватное поле: количество дверей
+    
+    // Конструктор класса Car - создает новый автомобиль
+    constructor(name, maxSpeed, engine, bodyType, doorsCount) {
+        // КОМПОЗИЦИЯ: создаем объект Vehicle внутри Car
+        this.#vehicle = new Vehicle(name, maxSpeed, engine);
+        this.#bodyType = bodyType;     // Устанавливаем тип кузова
+        this.#doorsCount = doorsCount; // Устанавливаем количество дверей
+    }
+    
+    // Геттер для получения вложенного объекта Vehicle
+    get vehicle() { return this.#vehicle; }
+    
+    // Геттер для получения типа кузова
+    get bodyType() { return this.#bodyType; }
+    
+    // Метод для строкового представления автомобиля
+    toString() { 
+        return `${this.#vehicle}, кузов: ${this.#bodyType}, дверей: ${this.#doorsCount}`; 
+    }
+}
+
+// Класс Поезд - представляет железнодорожный транспорт
+// КОМПОЗИЦИЯ: Train содержит Vehicle и массив Wagons
 class Train {
-  constructor(name, locomotive, carriages = []) {
-    this.name = name;
-    this.locomotive = locomotive;
-    this.carriages = carriages;
-    this.isAssembled = false;
-  }
-
-  static createExpressTrain(name, locomotive) {
-    return new Train(name, locomotive, []);
-  }
-
-  static createFreightTrain(name, locomotive) {
-    return new Train(name, locomotive, []);
-  }
-
-  addCarriage(carriage) {
-    this.carriages.push(carriage);
-    return `Added ${carriage.getInfo()} to train ${this.name}`;
-  }
-
-  removeCarriage(index) {
-    if (index >= 0 && index < this.carriages.length) {
-      const removed = this.carriages.splice(index, 1)[0];
-      return `Removed ${removed.getInfo()} from train ${this.name}`;
+    #vehicle;   // Приватное поле: объект транспортного средства (КОМПОЗИЦИЯ)
+    #wagons;    // Приватное поле: массив вагонов (КОМПОЗИЦИЯ)
+    #route;     // Приватное поле: маршрут поезда
+    
+    // Конструктор класса Train - создает новый поезд
+    constructor(name, maxSpeed, engine, route) {
+        // КОМПОЗИЦИЯ: создаем объект Vehicle внутри Train
+        this.#vehicle = new Vehicle(name, maxSpeed, engine);
+        this.#wagons = [];        // Инициализируем пустой массив вагонов
+        this.#route = route;      // Устанавливаем маршрут
     }
-    return 'Invalid carriage index';
-  }
-
-  assemble() {
-    this.isAssembled = true;
-    return `Train ${this.name} assembled with ${this.carriages.length} carriages`;
-  }
-
-  getInfo() {
-    const carriagesInfo = this.carriages.map(carriage => 
-      `  - ${carriage.getInfo()}`
-    ).join('\n');
     
-    return `Train: ${this.name}
-Locomotive: ${this.locomotive.getInfo()}
-Carriages (${this.carriages.length}):
-${carriagesInfo}
-Status: ${this.isAssembled ? 'assembled' : 'not assembled'}`;
-  }
-
-  calculateTotalCapacity() {
-    return this.carriages.reduce((total, carriage) => 
-      total + carriage.capacity, 0
-    );
-  }
+    // Геттер для получения вложенного объекта Vehicle
+    get vehicle() { return this.#vehicle; }
+    
+    // Геттер для получения массива вагонов
+    get wagons() { return this.#wagons; }
+    
+    // Геттер для получения маршрута
+    get route() { return this.#route; }
+    
+    // Метод для добавления вагона в поезд
+    addWagon(wagon) {
+        this.#wagons.push(wagon); // Добавляем вагон в массив
+    }
+    
+    // Метод для расчета общей вместимости всех вагонов поезда
+    getTotalCapacity() {
+        // Суммируем вместимость всех вагонов в массиве
+        return this.#wagons.reduce((total, wagon) => total + wagon.capacity, 0);
+    }
+    
+    // Метод для строкового представления поезда
+    toString() {
+        return `${this.#vehicle}, маршрут: "${this.#route}", вагонов: ${this.#wagons.length}`;
+    }
 }
 
-class TransportSystem {
-  constructor() {
-    this.vehicles = [];
-    this.trains = [];
-  }
-
-  static create() {
-    return new TransportSystem();
-  }
-
-  addVehicle(vehicle) {
-    this.vehicles.push(vehicle);
-    return `Added vehicle: ${vehicle.name}`;
-  }
-
-  addTrain(train) {
-    this.trains.push(train);
-    return `Added train: ${train.name}`;
-  }
-
-  startAll() {
-    const results = [];
-    this.vehicles.forEach(vehicle => {
-      results.push(vehicle.start());
-    });
-    this.trains.forEach(train => {
-      if (train.locomotive) {
-        results.push(train.locomotive.start());
-      }
-    });
-    return results;
-  }
-
-  getSystemInfo() {
-    const vehiclesInfo = this.vehicles.map(vehicle => 
-      `- ${vehicle.getInfo()}`
-    ).join('\n');
+// Класс Экспресс - представляет скоростной поезд
+// КОМПОЗИЦИЯ: Express содержит Train
+class Express {
+    #train;         // Приватное поле: объект поезда (КОМПОЗИЦИЯ)
+    #comfortClass;  // Приватное поле: класс комфорта
+    #hasWiFi;       // Приватное поле: наличие WiFi
     
-    const trainsInfo = this.trains.map(train => 
-      `- ${train.getInfo()}`
-    ).join('\n\n');
-
-    return `Transport System Overview:
+    // Конструктор класса Express - создает новый экспресс
+    constructor(name, maxSpeed, engine, route, comfortClass, hasWiFi) {
+        // КОМПОЗИЦИЯ: создаем объект Train внутри Express
+        this.#train = new Train(name, maxSpeed, engine, route);
+        this.#comfortClass = comfortClass; // Устанавливаем класс комфорта
+        this.#hasWiFi = hasWiFi;           // Устанавливаем наличие WiFi
+    }
     
-Vehicles (${this.vehicles.length}):
-${vehiclesInfo}
-
-Trains (${this.trains.length}):
-${trainsInfo}`;
-  }
+    // Геттер для получения вложенного объекта Train
+    get train() { return this.#train; }
+    
+    // Геттер для получения класса комфорта
+    get comfortClass() { return this.#comfortClass; }
+    
+    // Делегирование метода addWagon объекту Train
+    addWagon(wagon) { this.#train.addWagon(wagon); }
+    
+    // Делегирование метода getTotalCapacity объекту Train
+    getTotalCapacity() { return this.#train.getTotalCapacity(); }
+    
+    // Метод для строкового представления экспресса
+    toString() {
+        return `${this.#train}, класс: ${this.#comfortClass}, ${this.#hasWiFi ? 'WiFi' : 'без WiFi'}`;
+    }
 }
 
-// Демонстрационная программа
-console.log('=== TRANSPORT SYSTEM DEMONSTRATION ===\n');
+// Статический класс-фабрика для создания транспортных объектов
+class TransportFactory {
+    // Статический метод для создания двигателей разных типов
+    static createEngine(type) {
+        // Объект с предустановленными типами двигателей
+        const engines = {
+            diesel: new Engine("Дизельный", 150),
+            petrol: new Engine("Бензиновый", 120),
+            electric: new Engine("Электрический", 200)
+        };
+        // Возвращаем соответствующий двигатель или стандартный если тип не найден
+        return engines[type] || new Engine();
+    }
+    
+    // Статический метод для создания вагонов разных типов
+    static createWagon(type) {
+        // Объект с предустановленными типами вагонов
+        const wagons = {
+            passenger: new Wagon("Пассажирский", 80),
+            cargo: new Wagon("Грузовой", 1000),
+            restaurant: new Wagon("Ресторан", 40)
+        };
+        // Возвращаем соответствующий вагон или стандартный если тип не найден
+        return wagons[type] || new Wagon();
+    }
+    
+    // Статический метод для создания автомобилей разных типов
+    static createCar(type) {
+        // Объект с предустановленными конфигурациями автомобилей
+        const cars = {
+            sedan: new Car("Седан", 200, TransportFactory.createEngine("petrol"), "Седан", 4),
+            suv: new Car("Внедорожник", 180, TransportFactory.createEngine("diesel"), "Внедорожник", 5),
+            sport: new Car("Спорткар", 300, TransportFactory.createEngine("petrol"), "Купе", 2)
+        };
+        // Возвращаем соответствующий автомобиль или стандартный если тип не найден
+        return cars[type] || new Car("Автомобиль", 180, TransportFactory.createEngine("petrol"), "Седан", 4);
+    }
+    
+    // Статический метод для создания поездов разных типов
+    static createTrain(type) {
+        // Создаем поезд с параметрами в зависимости от типа
+        const train = new Train(
+            type === "passenger" ? "Пассажирский поезд" : "Грузовой поезд",
+            type === "passenger" ? 140 : 100,
+            TransportFactory.createEngine("diesel"),
+            type === "passenger" ? "Москва - СПб" : "Грузовой маршрут"
+        );
+        
+        // Определяем какие вагоны добавлять в зависимости от типа поезда
+        const wagonTypes = type === "passenger" 
+            ? ["passenger", "passenger", "restaurant"]  // Пассажирские вагоны + ресторан
+            : ["cargo", "cargo", "cargo"];              // Только грузовые вагоны
+            
+        // Добавляем вагоны в поезд
+        wagonTypes.forEach(wagonType => train.addWagon(TransportFactory.createWagon(wagonType)));
+        return train;
+    }
+    
+    // Статический метод для создания экспресс-поезда
+    static createExpress() {
+        // Создаем экспресс с высокоскоростными параметрами
+        const express = new Express(
+            "Скоростной экспресс",
+            350, // Высокая скорость
+            TransportFactory.createEngine("electric"), // Электрический двигатель
+            "Москва - Казань", // Маршрут
+            "Бизнес", // Высокий класс комфорта
+            true      // Есть WiFi
+        );
+        
+        // Добавляем несколько пассажирских вагонов
+        for (let i = 0; i < 3; i++) {
+            express.addWagon(TransportFactory.createWagon("passenger"));
+        }
+        
+        return express;
+    }
+}
 
-// Создание двигателей
-const dieselEngine = Engine.createDiesel(500, 12);
-const electricEngine = Engine.createElectric(800);
-const gasolineEngine = Engine.createGasoline(200, 3.0);
+// Статический класс для управления и анализа транспорта
+class TransportManager {
+    // Статический метод для поиска самого быстрого транспортного средства
+    static findFastest(vehicles) {
+        // Используем reduce для поиска максимального значения
+        return vehicles.reduce((fastest, current) => {
+            // Получаем скорость текущего транспорта (учитываем композицию)
+            const currentSpeed = current.vehicle ? current.vehicle.maxSpeed : current.maxSpeed;
+            // Получаем скорость текущего самого быстрого транспорта
+            const fastestSpeed = fastest.vehicle ? fastest.vehicle.maxSpeed : fastest.maxSpeed;
+            // Сравниваем и возвращаем более быстрый транспорт
+            return currentSpeed > fastestSpeed ? current : fastest;
+        });
+    }
+    
+    // Статический метод для расчета времени пути
+    static calculateTravelTime(distance, transport) {
+        // Получаем скорость транспорта (учитываем композицию)
+        const speed = transport.vehicle ? transport.vehicle.maxSpeed : transport.maxSpeed;
+        // Вычисляем время в часах
+        const hours = distance / speed;
+        // Возвращаем объект с часами и минутами
+        return { 
+            hours: Math.floor(hours),                    // Целая часть часов
+            minutes: Math.round((hours % 1) * 60)       // Оставшиеся минуты
+        };
+    }
+}
 
-// Создание транспортных средств
-const automobile = TransportVehicle.createAutomobile(
-  'Volvo Truck',
-  dieselEngine,
-  120,
-  3
-);
+// ДЕМОНСТРАЦИЯ РАБОТЫ ВСЕЙ СИСТЕМЫ
+console.log("=== ДЕМОНСТРАЦИЯ КОМПОЗИЦИИ В ТРАНСПОРТНОЙ СИСТЕМЕ ===\n");
 
-const locomotive = TransportVehicle.createLocomotive(
-  'Electric Locomotive',
-  electricEngine,
-  160
-);
+// Используем фабрику для создания различных транспортных средств
+const car = TransportFactory.createCar("sport");        // Создаем спортивный автомобиль
+const train = TransportFactory.createTrain("passenger"); // Создаем пассажирский поезд
+const express = TransportFactory.createExpress();       // Создаем скоростной экспресс
 
-const express = TransportVehicle.createExpress(
-  'High-Speed Express',
-  electricEngine,
-  300,
-  150
-);
+// Помещаем все созданные транспортные средства в массив
+const transports = [car, train, express];
 
-// Создание вагонов
-const passengerCarriage1 = Carriage.createPassenger(80, 'high');
-const passengerCarriage2 = Carriage.createPassenger(90, 'standard');
-const restaurantCarriage = Carriage.createRestaurant();
-const cargoCarriage = Carriage.createCargo(50000);
-
-// Создание поездов
-const expressTrain = Train.createExpressTrain('Sapsan', locomotive);
-const freightTrain = Train.createFreightTrain('Freight Express', locomotive);
-
-// Добавление вагонов к поездам
-console.log(expressTrain.addCarriage(passengerCarriage1));
-console.log(expressTrain.addCarriage(passengerCarriage2));
-console.log(expressTrain.addCarriage(restaurantCarriage));
-console.log(expressTrain.assemble());
-
-console.log(freightTrain.addCarriage(cargoCarriage));
-console.log(freightTrain.addCarriage(cargoCarriage));
-console.log(freightTrain.assemble());
-
-// Создание транспортной системы
-const transportSystem = TransportSystem.create();
-
-// Добавление транспортных средств в систему
-console.log(transportSystem.addVehicle(automobile));
-console.log(transportSystem.addVehicle(express));
-console.log(transportSystem.addTrain(expressTrain));
-console.log(transportSystem.addTrain(freightTrain));
-
-// Информация о системе
-console.log('\n' + transportSystem.getSystemInfo());
-
-console.log('\n=== OPERATIONS ===\n');
-
-// Запуск транспорта
-console.log('Starting all vehicles:');
-transportSystem.startAll().forEach(status => {
-  console.log(status);
+console.log("=== СОЗДАННЫЕ ТРАНСПОРТНЫЕ СРЕДСТВА ===");
+// Выводим информацию о каждом транспорте
+transports.forEach((transport, i) => {
+    console.log(`${i + 1}. ${transport.toString()}`);
 });
 
-console.log('\n=== VEHICLE OPERATIONS ===\n');
+console.log("\n=== ИНФОРМАЦИЯ О КОМПОЗИЦИИ ===");
+// Демонстрируем как работает композиция - объекты содержат другие объекты
+console.log("Автомобиль содержит:", car.vehicle.toString());
+console.log("Поезд содержит:", train.vehicle.toString(), "+", train.wagons.length, "вагонов");
+console.log("Экспресс содержит поезд, который содержит:", express.train.vehicle.toString());
 
-// Демонстрация работы отдельных транспортных средств
-console.log(automobile.getInfo());
-console.log(automobile.start());
-console.log(automobile.getStatus());
-console.log(automobile.stop());
+console.log("\n=== САМОЕ БЫСТРОЕ ТРАНСПОРТНОЕ СРЕДСТВО ===");
+// Используем TransportManager для поиска самого быстрого транспорта
+const fastest = TransportManager.findFastest(transports);
+console.log(fastest.toString());
 
-console.log('\n=== TRAIN OPERATIONS ===\n');
-
-// Демонстрация работы поездов
-console.log(expressTrain.getInfo());
-console.log(`Total passenger capacity: ${expressTrain.calculateTotalCapacity()}`);
-
-console.log('\n' + freightTrain.getInfo());
-console.log(`Total cargo capacity: ${freightTrain.calculateTotalCapacity()}kg`);
-
-console.log('\n=== ENGINE DEMONSTRATION ===\n');
-
-// Демонстрация работы двигателей
-console.log(dieselEngine.getInfo());
-console.log(electricEngine.getInfo());
-console.log(gasolineEngine.getInfo());
-
-console.log('\n=== CARRIAGE OPERATIONS ===\n');
-
-// Демонстрация работы вагонов
-console.log(passengerCarriage1.getInfo());
-console.log(passengerCarriage1.load(50));
-console.log(passengerCarriage1.unload());
-
-console.log('\n' + cargoCarriage.getInfo());
-console.log(cargoCarriage.load(25000));
-
-console.log('\n=== DEMONSTRATION COMPLETE ===');
+console.log("\n=== ВРЕМЯ ПУТИ (700 км) ===");
+// Рассчитываем время пути для каждого транспорта на дистанции 700 км
+transports.forEach(transport => {
+    const time = TransportManager.calculateTravelTime(700, transport);
+    console.log(`${transport.vehicle.name}: ${time.hours}ч ${time.minutes}м`);
+});
